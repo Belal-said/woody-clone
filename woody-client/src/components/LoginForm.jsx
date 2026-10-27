@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
-import { API_URL } from "../config/api";
+// import axios from "axios";
+// import { API_URL } from "../config/api";
 import "./components-style.css";
 
 function LoginForm({ onLogin }) {
@@ -12,35 +12,56 @@ function LoginForm({ onLogin }) {
         e.preventDefault();
         setError(null);
 
-        axios
-            .post(`${API_URL}/api/auth/login`, { email, password })
-            .then((loginRes) => {
-                const userData = loginRes.data;
-                const headers = { Authorization: `Bearer ${userData.token}` };
+        // Temporary: real sign-in is disabled; any email/password gets a
+        // local admin user. Restore the commented block below when the
+        // auth API is available again.
+        const user = {
+            email,
+            role: "admin",
+            token: "dev-token",
+            permissions: [
+                "tips:view",
+                "tips:write",
+                "tips:employees",
+                "sales:view",
+                "commissions:view",
+                "checklists:view",
+                "finance:cash-drops",
+                "safe-count:manage",
+            ],
+        };
+        localStorage.setItem("user", JSON.stringify(user));
+        onLogin(user);
 
-                return Promise.all([
-                    Promise.resolve(userData),
-                    axios.get(`${API_URL}/api/auth/permissions`, { headers }),
-                ]);
-            })
-            .then(([userData, permRes]) => {
-                const user = {
-                    ...userData.user,
-                    role: userData.user.role?.toLowerCase(),
-                    token: userData.token,
-                    permissions: permRes.data.permissions,
-                    roles: permRes.data.roles,
-                };
-                localStorage.setItem("user", JSON.stringify(user));
-                onLogin(user);
-            })
-            .catch((err) => {
-                if (err.response?.status === 401 || err.response?.status === 403) {
-                    setError("Invalid email or password.");
-                } else {
-                    setError(err.response?.data?.message ?? "Something went wrong. Please try again.");
-                }
-            });
+        // axios
+        //     .post(`${API_URL}/api/auth/login`, { email, password })
+        //     .then((loginRes) => {
+        //         const userData = loginRes.data;
+        //         const headers = { Authorization: `Bearer ${userData.token}` };
+
+        //         return Promise.all([
+        //             Promise.resolve(userData),
+        //             axios.get(`${API_URL}/api/auth/permissions`, { headers }),
+        //         ]);
+        //     })
+        //     .then(([userData, permRes]) => {
+        //         const user = {
+        //             ...userData.user,
+        //             role: userData.user.role?.toLowerCase(),
+        //             token: userData.token,
+        //             permissions: permRes.data.permissions,
+        //             roles: permRes.data.roles,
+        //         };
+        //         localStorage.setItem("user", JSON.stringify(user));
+        //         onLogin(user);
+        //     })
+        //     .catch((err) => {
+        //         if (err.response?.status === 401 || err.response?.status === 403) {
+        //             setError("Invalid email or password.");
+        //         } else {
+        //             setError(err.response?.data?.message ?? "Something went wrong. Please try again.");
+        //         }
+        //     });
     };
 
 

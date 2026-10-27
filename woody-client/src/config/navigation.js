@@ -85,15 +85,5 @@ export const navigation = [
             "admin",
             "manager"
         ]
-    },
-    {
-        name: "new Dash",
-        path: "/newdash",
-        roles: [
-            "admin",
-            "manager",
-            "employee"
-        ],
-        custom: true
     }
 ];
