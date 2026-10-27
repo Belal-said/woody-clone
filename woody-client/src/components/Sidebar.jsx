@@ -1,9 +1,10 @@
 import { NavLink } from "react-router";
-import { navigation } from "../config/navigation";
+import { getAllNavigation } from "../config/customDashboards";
 import { useUser } from "../context/UserContext";
 
 function Sidebar() {
     const user = useUser();
+    const navigation = getAllNavigation();
 
     if (!user) return null;
 

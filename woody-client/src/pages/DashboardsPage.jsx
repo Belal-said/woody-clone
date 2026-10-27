@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { navigation } from "../config/navigation";
+import {
+    getAllNavigation,
+    getCustomDashboards,
+    addDashboard,
+    removeDashboard,
+} from "../config/customDashboards";
 import "../components/components-style.css";
 
 const ALL_ROLES = ["admin", "manager", "employee"];
@@ -10,7 +15,7 @@ function DashboardsPage() {
     const [roles, setRoles] = useState(ALL_ROLES);
     const [error, setError] = useState(null);
 
-    const customDashboards = navigation.filter((item) => item.custom);
+    const customDashboards = getCustomDashboards();
 
     const toggleRole = (role) => {
         setRoles((prev) =>
@@ -35,16 +40,11 @@ function DashboardsPage() {
         if (!trimmedName) return setError("Name is required.");
         if (!slug) return setError("Path is required.");
         if (roles.length === 0) return setError("Pick at least one role.");
+        if (getAllNavigation().some((item) => item.path === `/${slug}`))
+            return setError(`/${slug} is already used.`);
 
-        // The Vite dev server writes the entry into navigation.js,
-        // then reloads the page with the updated file.
-        fetch("/__navigation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: trimmedName, path: `/${slug}`, roles }),
-        })
-            .then(async (res) => {
-                if (!res.ok) throw new Error((await res.json()).error);
+        addDashboard({ name: trimmedName, path: `/${slug}`, roles })
+            .then(() => {
                 setName("");
                 setPath("");
             })
@@ -53,13 +53,7 @@ function DashboardsPage() {
 
     const handleRemove = (navPath) => {
         setError(null);
-        fetch(`/__navigation?path=${encodeURIComponent(navPath)}`, {
-            method: "DELETE",
-        })
-            .then(async (res) => {
-                if (!res.ok) throw new Error((await res.json()).error);
-            })
-            .catch((err) => setError(err.message));
+        removeDashboard(navPath).catch((err) => setError(err.message));
     };
 
     return (
