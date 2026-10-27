@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { API_URL } from "../config/api";
 import "./components-style.css";
 
 function LoginForm({ onLogin }) {
@@ -12,14 +13,14 @@ function LoginForm({ onLogin }) {
         setError(null);
 
         axios
-            .post("https://api.woody.hwoodgroup.com/api/auth/login", { email, password })
+            .post(`${API_URL}/api/auth/login`, { email, password })
             .then((loginRes) => {
                 const userData = loginRes.data;
                 const headers = { Authorization: `Bearer ${userData.token}` };
 
                 return Promise.all([
                     Promise.resolve(userData),
-                    axios.get("https://api.woody.hwoodgroup.com/api/auth/permissions", { headers }),
+                    axios.get(`${API_URL}/api/auth/permissions`, { headers }),
                 ]);
             })
             .then(([userData, permRes]) => {
