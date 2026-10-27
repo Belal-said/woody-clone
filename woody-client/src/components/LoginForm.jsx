@@ -12,14 +12,14 @@ function LoginForm({ onLogin }) {
         setError(null);
 
         axios
-            .post("http://localhost:3001/api/auth/login", { email, password })
+            .post("https://api.woody.hwoodgroup.com/api/auth/login", { email, password })
             .then((loginRes) => {
                 const userData = loginRes.data;
                 const headers = { Authorization: `Bearer ${userData.token}` };
 
                 return Promise.all([
                     Promise.resolve(userData),
-                    axios.get("http://localhost:3001/api/auth/permissions", { headers }),
+                    axios.get("https://api.woody.hwoodgroup.com/api/auth/permissions", { headers }),
                 ]);
             })
             .then(([userData, permRes]) => {
